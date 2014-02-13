@@ -31,7 +31,7 @@ SENSOR_ANGLE.sort()
 class Scanner(threading.Thread):
     def run(self):
         BrickPi.MotorEnable[PORT_C] = 1
-        SCAN_SPEED = 150
+        SCAN_SPEED = 100
         direction = 1
         last_read = None
         while True:
@@ -57,7 +57,7 @@ class Scanner(threading.Thread):
             
 
 scanner = Scanner()
-scanner.deamon = True
+scanner.daemon = True
 scanner.start()
             
 while True:
