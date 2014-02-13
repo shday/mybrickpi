@@ -25,10 +25,10 @@ BrickPi.SensorType[PORT_4] = TYPE_SENSOR_TOUCH
 BrickPiSetupSensors()   #Send the properties of sensors to BrickPi
 
 sensor_dist = [None] * 5
-SENSOR_ANGLES = [-90,-45,0,45,90]
-SENSOR_ANGLES.sort()
+SENSOR_ANGLE = [-90,-45,0,45,90]
+SENSOR_ANGLE.sort()
 
-class Scanner(theading.Thread):
+class Scanner(threading.Thread):
     def run(self):
         BrickPi.MotorEnable[PORT_C] = 1
         SCAN_SPEED = 150
