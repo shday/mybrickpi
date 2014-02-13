@@ -37,7 +37,7 @@ class Scanner(threading.Thread):
         while True:
             BrickPiUpdateValues()
             angle = BrickPi.Encoder[PORT_C]
-            if angle >= SENSOR_ANGLES[-1]:
+            if angle >= SENSOR_ANGLE[-1]:
                 direction = -1
                 sensor_dist[-1] = BrickPi.Sensor[PORT_3]
                 last_read = -1
