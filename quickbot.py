@@ -28,32 +28,31 @@ sensor_dist = [None] * 5
 SENSOR_ANGLE = [-90,-45,0,45,90]
 SENSOR_ANGLE.sort()
 
+running = True
 class Scanner(threading.Thread):
     def run(self):
         BrickPi.MotorEnable[PORT_C] = 1
-        SCAN_SPEED = 100
+        SCAN_SPEED = 60
         direction = 1
-        last_read = None
-        while True:
-            BrickPiUpdateValues()
+        last_read = 2
+        while running:
+            result = BrickPiUpdateValues()
+            if result:
+                print result
             angle = BrickPi.Encoder[PORT_C]
-            if angle >= SENSOR_ANGLE[-1]:
-                direction = -1
-                sensor_dist[-1] = BrickPi.Sensor[PORT_3]
-                last_read = -1
-            elif angle <= SENSOR_ANGLE[0]:
-                direction = 1
-                sensor_dist[0] = BrickPi.Sensor[PORT_3]
-                last_read = 0
-            elif last_read != 2:
-                if direction == 1 and angle >= SENSOR_ANGLE[2]:
-                    sensor_dist[2] = BrickPi.Sensor[PORT_3]
-                    last_read = 2
-                elif direction == -1 and angle <= SENSOR_ANGLE[2]:
-                    sensor_dist[2] = BrickPi.Sensor[PORT_3]
-                    last_read = 2
+            if direction == 1 and angle >= 2*SENSOR_ANGLE[last_read+1]:
+                sensor_dist[last_read+1] = (angle/2,BrickPi.Sensor[PORT_3])
+                last_read = last_read+1
+                if last_read == len(SENSOR_ANGLE)-1:
+                    direction = -1
+            elif direction == -1 and angle <= 2*SENSOR_ANGLE[last_read-1]:
+                sensor_dist[last_read-1] = (angle/2,BrickPi.Sensor[PORT_3])
+                last_read = last_read-1
+                if last_read == 0:
+                    direction = 1
+                               
             BrickPi.MotorSpeed[PORT_C] = direction * SCAN_SPEED
-            time.sleep(0.1)
+            time.sleep(0.05)
             
 
 scanner = Scanner()
@@ -71,6 +70,8 @@ while True:
 
 
     except KeyboardInterrupt:			#Triggered by pressing Ctrl+C
+        running = False
+        time.sleep(1.0)
         GPIO.cleanup()
         print "Bye"
         break					#Exit
